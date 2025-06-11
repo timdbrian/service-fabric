@@ -60,30 +60,27 @@ The build also requires approximately 70GB of disk space.
 ### Get a Linux machine
 This is the Linux version of Service Fabric. You need a Linux machine to build this project.  If you already have a Linux machine, great! You can get started below.  If not, you can get a [Linux machine on Azure](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/Canonical.UbuntuServer?tab=Overview).
 
-### Installing docker
-Our build environment depends on Docker. In order to get started you will need to [install docker](https://docs.docker.com/engine/installation/).  
-
-There are many ways to install docker. Here is how to install on Ubuntu:
+### Installing LXD
+Our build environment now depends on LXD. Install LXD using your package manager and initialize it:
 
 ```sh
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get install -y docker-ce
+sudo apt-get install -y lxd
+newgrp lxd
+lxd init --auto
 ```
 
-## Optional: Enable executing docker without sudo
-By default docker requires root privelages to run. In order to run docker as a regular user (i.e, not root), you need to add the user to the `docker` user group:
+## Optional: Enable executing LXD without sudo
+By default LXD requires root privileges to run. To manage containers as a regular user add yourself to the `lxd` group:
 
 ```sh
-sudo usermod -aG docker ${USER}
+sudo usermod -aG lxd ${USER}
 su - ${USER}
 ```
 
-You do not need to do this, but note that if you skip this step, you must run all docker commands with sudo.
+You do not need to do this, but note that if you skip this step, you must run all `lxc` commands with sudo.
 
 ## Build Service Fabric
-To start the build inside of a docker container you can clone the repository and run this command from the root directory:
+To start the build inside of an LXD container you can clone the repository and run this command from the root directory:
 
 ```sh
 
@@ -109,22 +106,8 @@ Currently, the build container is based off a base image that includes a few Ser
 
 This will pull all of the required packages, add Service Fabric internal dependencies, and apply patches.
 
-#### Troubleshooting: Internet connectivity when installing local docker containers behind a firewall
-A common issue with building a docker container behind a firewall is when the firewall blocks the default DNS used by docker.  This will manifest as packages failing to download during the `docker build` step (such as in the `builddocker.sh` script above).  
-
-To fix this, you need to tell Docker to use an alternative DNS server.  As a root user, create or edit the Docker daemon's config file at `/etc/docker/daemon.json` so that it has an entry that looks like this:
-
-```json
-{ 
-    "dns": ["<my DNS server IP here>", "<my DNS secondary server IP here>"] 
-}
-```
-
-Take note to replace the above command with your actual local DNS server, and restart docker:
-
-```sh
-service docker restart
-```
+#### Troubleshooting: Internet connectivity when installing local LXD images behind a firewall
+When working behind a firewall you may need to configure proxy or DNS settings for LXD before building the image.
 ## Testing a local cluster  
 For more details please refer to [Testing using ClusterDeployer](docs/cluster_deployer_test.md).
 

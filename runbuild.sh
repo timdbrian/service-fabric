@@ -38,5 +38,5 @@ EOF
 done
 
 build_command="cd /out/ && /src/build.sh  ${NINJA_FLAG} -d $BUILD_PARAMS"
-echo "Running Build for ${TARGET_OS} in docker..."
-exec $CDIR_RUNBUILD/tools/docker/run_in_docker.sh $TARGET_OS "$build_command" 
+echo "Running Build for ${TARGET_OS} in LXD..."
+exec $CDIR_RUNBUILD/tools/lxd/run_in_lxd.sh $TARGET_OS "$build_command"
