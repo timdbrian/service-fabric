@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 print_help() {
     cat <<EOF_HELP
@@ -56,18 +57,32 @@ if ! lxc info >/dev/null 2>&1; then
     }
 fi
 
+ensure_remote() {
+    local name="$1" url="$2" protocol="$3"
+    if ! lxc remote list | awk '{print $1}' | grep -Fxq "$name"; then
+        echo "Adding LXD remote '$name'..."
+        lxc remote add "$name" "$url" --protocol="$protocol" || {
+            echo "Failed to add remote $name" >&2
+            exit 1
+        }
+    fi
+}
+
 build_image() {
     local base_image prep_script build_container
     case "$TARGET_OS" in
         ubuntu)
-            base_image="images:ubuntu/16.04"
+            ensure_remote ubuntu https://cloud-images.ubuntu.com/releases simplestreams
+            base_image="ubuntu:16.04"
             prep_script="$REPO_ROOT/tools/build/sf-prep.sh"
             ;;
         ubuntu18)
-            base_image="images:ubuntu/18.04"
+            ensure_remote ubuntu https://cloud-images.ubuntu.com/releases simplestreams
+            base_image="ubuntu:18.04"
             prep_script="$REPO_ROOT/tools/build/sf-prep-1804.sh"
             ;;
         centos)
+            ensure_remote images https://images.linuxcontainers.org simplestreams
             base_image="images:centos/7"
             prep_script=""
             ;;
