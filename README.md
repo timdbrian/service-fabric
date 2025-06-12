@@ -95,16 +95,11 @@ Additionally in order to build and create the installer packages you can pass in
 ./runbuild.sh -createinstaller
 ```
 
-#### Optional: Build the container locally
-If you would prefer to build the container locally, you can run the following script:
-
-```sh
-sudo ./tools/builddocker.sh
-```
-
-Currently, the build container is based off a base image that includes a few Service Fabric dependencies that have either not yet been open sourced, or must be included due to technical constraints (for example, some .NET files currently only build on Windows, but are required for a Linux build).
-
-This will pull all of the required packages, add Service Fabric internal dependencies, and apply patches.
+#### First run
+The `runbuild.sh` script will build an LXD image the first time it is executed.
+This process downloads a base distribution container and installs all Service
+Fabric build dependencies.  Subsequent runs reuse the created image which
+speeds up the build.
 
 #### Troubleshooting: Internet connectivity when installing local LXD images behind a firewall
 When working behind a firewall you may need to configure proxy or DNS settings for LXD before building the image.
