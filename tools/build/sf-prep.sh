@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Avoid interactive setup in package installations such as tzdata asking for
 # a geographic region
