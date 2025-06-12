@@ -122,8 +122,18 @@ fi
 lxc launch "$IMAGE_NAME:$IMAGE_VERSION" "$CONTAINER_NAME" --ephemeral >/dev/null
 
 lxc config device add "$CONTAINER_NAME" out disk source="$OUT_DIR" path=/out >/dev/null
-lxc config device add "$CONTAINER_NAME" external disk source="$REPO_ROOT/external" path=/external >/dev/null
-lxc config device add "$CONTAINER_NAME" deps disk source="$REPO_ROOT/deps" path=/deps >/dev/null
+
+add_disk_if_exists() {
+    local name="$1" path="$2" target="$3"
+    if [ -d "$path" ]; then
+        lxc config device add "$CONTAINER_NAME" "$name" disk source="$path" path="$target" >/dev/null
+    else
+        echo "Warning: $path not found, skipping mount $name" >&2
+    fi
+}
+
+add_disk_if_exists external "$REPO_ROOT/external" /external
+add_disk_if_exists deps "$REPO_ROOT/deps" /deps
 lxc config device add "$CONTAINER_NAME" src disk source="$REPO_ROOT/src" path=/src >/dev/null
 lxc config device add "$CONTAINER_NAME" config disk source="$REPO_ROOT/.config" path=/.config >/dev/null
 lxc config device add "$CONTAINER_NAME" scripts disk source="$REPO_ROOT/tools/ci/scripts" path=/scripts >/dev/null

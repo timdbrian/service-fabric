@@ -29,11 +29,6 @@ apt-get install -y libncurses5-dev libncursesw5-dev swig libedit-dev  #llvm
 #build cpprest
 ln -s /usr/include/locale.h /usr/include/xlocale.h
 
-#docker ce
-wget -q -O - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sh -c 'echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" > /etc/apt/sources.list.d/docker.list'
-apt-get update
-apt-get install -y docker-ce
 
 #dotnet
 wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
