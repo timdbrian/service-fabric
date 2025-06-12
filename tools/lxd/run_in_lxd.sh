@@ -134,9 +134,9 @@ add_disk_if_exists() {
 
 add_disk_if_exists external "$REPO_ROOT/external" /external
 add_disk_if_exists deps "$REPO_ROOT/deps" /deps
-lxc config device add "$CONTAINER_NAME" src disk source="$REPO_ROOT/src" path=/src >/dev/null
-lxc config device add "$CONTAINER_NAME" config disk source="$REPO_ROOT/.config" path=/.config >/dev/null
-lxc config device add "$CONTAINER_NAME" scripts disk source="$REPO_ROOT/tools/ci/scripts" path=/scripts >/dev/null
+add_disk_if_exists src "$REPO_ROOT/src" /src
+add_disk_if_exists config "$REPO_ROOT/.config" /.config
+add_disk_if_exists scripts "$REPO_ROOT/tools/ci/scripts" /scripts
 
 echo -e "Running command:\n\t'$CMD'\n" "in LXD container $CONTAINER_NAME using image $IMAGE_NAME:$IMAGE_VERSION"
 lxc exec "$CONTAINER_NAME" -- bash -c "$CMD"
