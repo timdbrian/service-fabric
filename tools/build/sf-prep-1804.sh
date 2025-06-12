@@ -18,7 +18,7 @@ apt-get install -y libc++1 #FabricTestHost.exe requires.
 apt-get purge -y libc++-dev libc++abi-dev
 apt-get install -y clang-6.0 llvm-6.0-dev # DON'T INSTALL: libc++-dev libc++abi-dev, due to #include_next in string.h
 
-apt-get install -y golang go-md2man
+apt-get install -y golang-go go-md2man
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
 
 #build 3rd parties

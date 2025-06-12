@@ -18,7 +18,10 @@ apt-get install -y libcgroup-dev cgroup-bin
 apt-get install -y lttng-tools liblttng-ust-dev liblttng-ctl-dev lttng-modules-dkms
 apt-get install -y libcurl4-openssl-dev
 
-apt-get install -y golang go-md2man
+apt-get install -y software-properties-common
+add-apt-repository -y ppa:longsleep/golang-backports
+apt-get update
+apt-get install -y golang-go go-md2man
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
 
 #build 3rd parties

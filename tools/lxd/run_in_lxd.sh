@@ -40,10 +40,14 @@ mkdir -p "$OUT_DIR"
 if ! command -v lxc >/dev/null 2>&1; then
     if command -v apt-get >/dev/null 2>&1; then
         echo "LXD not found. Installing via apt-get..."
-        sudo apt-get update && sudo apt-get install -y lxd || {
-            echo "Failed to install LXD" >&2
-            exit 1
-        }
+        if ! (sudo apt-get update && sudo apt-get install -y lxd); then
+            echo "apt-get install failed, trying snap..."
+            if ! command -v snap >/dev/null 2>&1; then
+                echo "snap not found. Installing snapd via apt-get..."
+                sudo apt-get install -y snapd || { echo "Failed to install snapd" >&2; exit 1; }
+            fi
+            sudo snap install lxd || { echo "Failed to install LXD" >&2; exit 1; }
+        fi
     else
         echo "LXD is required but not installed." >&2
         exit 1
