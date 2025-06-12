@@ -136,7 +136,6 @@ add_disk_if_exists external "$REPO_ROOT/external" /external
 add_disk_if_exists deps "$REPO_ROOT/deps" /deps
 add_disk_if_exists src "$REPO_ROOT/src" /src
 add_disk_if_exists config "$REPO_ROOT/.config" /.config
-add_disk_if_exists scripts "$REPO_ROOT/tools/ci/scripts" /scripts
 
 echo -e "Running command:\n\t'$CMD'\n" "in LXD container $CONTAINER_NAME using image $IMAGE_NAME:$IMAGE_VERSION"
 lxc exec "$CONTAINER_NAME" -- bash -c "$CMD"
