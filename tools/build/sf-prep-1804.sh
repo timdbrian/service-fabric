@@ -46,4 +46,11 @@ apt-get install -y dotnet-sdk-2.1
 
 #dotnet 2.1 RunCsc permission fix
 dotnetVersion=$(dotnet --version)
-chmod 777 /usr/share/dotnet/sdk/${dotnetVersion}/Roslyn/bincore/RunCsc
+run_csc_dir="/usr/share/dotnet/sdk/${dotnetVersion}/Roslyn/bincore"
+if [ -f "$run_csc_dir/RunCsc" ]; then
+    chmod 777 "$run_csc_dir/RunCsc"
+elif [ -f "$run_csc_dir/RunCsc.sh" ]; then
+    chmod 777 "$run_csc_dir/RunCsc.sh"
+else
+    echo "RunCsc not found under $run_csc_dir, skipping permission fix"
+fi
