@@ -29,8 +29,9 @@ CMD="$2"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REPO_ROOT="$SCRIPT_DIR/../../"
 CAPS_OS_NAME=$(echo "$TARGET_OS" | awk '{print toupper($0)}')
-IMAGE_VERSION=$(cat "$REPO_ROOT/tools/build/${CAPS_OS_NAME}IMAGE_VERSION")
 IMAGE_NAME="microsoft/service-fabric-build-${TARGET_OS}"
+IMAGE_VERSION=$(cat "$REPO_ROOT/tools/build/${CAPS_OS_NAME}IMAGE_VERSION")
+IMAGE_ALIAS="${IMAGE_NAME}-${IMAGE_VERSION}"
 CONTAINER_NAME="sf-build-${TARGET_OS}-$$"
 OUT_DIR="$REPO_ROOT/out.${TARGET_OS}"
 mkdir -p "$OUT_DIR"
@@ -95,7 +96,7 @@ build_image() {
     esac
 
     build_container="sf-image-${TARGET_OS}-$$"
-    echo "Creating build image $IMAGE_NAME:$IMAGE_VERSION from $base_image..."
+    echo "Creating build image $IMAGE_ALIAS from $base_image..."
     lxc launch "$base_image" "$build_container" || exit 1
 
     if [ -n "$prep_script" ]; then
@@ -109,17 +110,17 @@ build_image() {
 
     lxc exec "$build_container" -- apt-get clean >/dev/null 2>&1 || true
     lxc snapshot "$build_container" clean
-    lxc publish "$build_container/clean" --alias "$IMAGE_NAME:$IMAGE_VERSION" >/dev/null
+    lxc publish "$build_container/clean" --alias "$IMAGE_ALIAS" >/dev/null
     lxc delete "$build_container" --force
 }
 
 # Build image if missing
-if ! lxc image info "$IMAGE_NAME:$IMAGE_VERSION" >/dev/null 2>&1; then
+if ! lxc image info "$IMAGE_ALIAS" >/dev/null 2>&1; then
     build_image
 fi
 
 # Launch ephemeral container for the build
-lxc launch "$IMAGE_NAME:$IMAGE_VERSION" "$CONTAINER_NAME" --ephemeral >/dev/null
+lxc launch "$IMAGE_ALIAS" "$CONTAINER_NAME" --ephemeral >/dev/null
 
 lxc config device add "$CONTAINER_NAME" out disk source="$OUT_DIR" path=/out >/dev/null
 
@@ -137,6 +138,6 @@ add_disk_if_exists deps "$REPO_ROOT/deps" /deps
 add_disk_if_exists src "$REPO_ROOT/src" /src
 add_disk_if_exists config "$REPO_ROOT/.config" /.config
 
-echo -e "Running command:\n\t'$CMD'\n" "in LXD container $CONTAINER_NAME using image $IMAGE_NAME:$IMAGE_VERSION"
+echo -e "Running command:\n\t'$CMD'\n" "in LXD container $CONTAINER_NAME using image $IMAGE_ALIAS"
 lxc exec "$CONTAINER_NAME" -- bash -c "$CMD"
 # Container will be removed automatically when command exits
