@@ -59,12 +59,14 @@ fi
 
 ensure_remote() {
     local name="$1" url="$2" protocol="$3"
-    if ! lxc remote list | awk '{print $1}' | grep -Fxq "$name"; then
+    local existing
+    existing=$(lxc remote list --format csv 2>/dev/null | cut -d, -f1 | grep -Fx "$name" || true)
+    if [ -z "$existing" ]; then
         echo "Adding LXD remote '$name'..."
-        lxc remote add "$name" "$url" --protocol="$protocol" || {
+        if ! lxc remote add "$name" "$url" --protocol="$protocol"; then
             echo "Failed to add remote $name" >&2
             exit 1
-        }
+        fi
     fi
 }
 
