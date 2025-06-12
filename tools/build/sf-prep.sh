@@ -9,11 +9,6 @@ apt update
 
 apt-get install -y openssh-server curl locales
 
-#download all the required pkgs
-curl -o /tmp/llvm-3.6-patched.tgz https://linuxbuilds.blob.core.windows.net/dockers/llvm-3.6-patched.tgz
-curl -o /tmp/libc++-3.5-2-headers.tgz https://linuxbuilds.blob.core.windows.net/dockers/libcpp-3.5-2-headers.tgz
-curl -o /tmp/clang50_gor_0310.tgz https://linuxbuilds.blob.core.windows.net/dockers/clang50_gor_0310.tgz
-
 #pkgs
 apt-get install -y build-essential git unzip sudo
 apt-get install -y cmake ninja-build clang llvm libc++1 libc++-dev libxml2-dev libssh2-1-dev
@@ -31,21 +26,6 @@ apt-get install -y libgpgme-dev lvm2 libseccomp-dev libdevmapper-dev  # build cr
 apt-get install -y libglib2.0-dev libpopt-dev              #build babeltrace
 apt-get install -y libncurses5-dev libncursesw5-dev swig libedit-dev  #llvm
 
-cd /usr/lib/
-tar xvf /tmp/llvm-3.6-patched.tgz
-ln -fs /usr/lib/llvm-3.6/bin/clang /usr/bin/clang
-ln -fs /usr/lib/llvm-3.6/bin/clang++ /usr/bin/clang++
-
-cd /usr/include/c++
-mv /usr/include/c++/v1 /usr/include/c++/v1-original
-tar xvf /tmp/libc++-3.5-2-headers.tgz
-
-cd /usr/lib/
-tar xvf /tmp/clang50_gor_0310.tgz
-
-cd ~
-
-
 # Install .NET sdk and runtime for building and running managed code of product.
 apt-get install -y apt-transport-https ca-certificates  apt-utils && \
     sh -c 'curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg' && \
@@ -53,7 +33,4 @@ apt-get install -y apt-transport-https ca-certificates  apt-utils && \
     sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-xenial-prod xenial main" > /etc/apt/sources.list.d/dotnetdev.list' && \
     apt-get update && \
     apt-get install -y dotnet-sdk-2.0.3 && \
-    apt-get install -y dotnet-runtime-2.0.7
-
-# Cleanup install files 
-rm -rf /tmp/llvm-3.6-patched.tgz /tmp/libc++-3.5-2-headers.tgz /tmp/clang50_gor_0310.tgz
+apt-get install -y dotnet-runtime-2.0.7

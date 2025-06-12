@@ -98,8 +98,10 @@ Additionally in order to build and create the installer packages you can pass in
 #### First run
 The `runbuild.sh` script will build an LXD image the first time it is executed.
 This process downloads a base distribution container and installs all Service
-Fabric build dependencies.  Subsequent runs reuse the created image which
-speeds up the build.
+Fabric build dependencies. If the prebuilt libraries are not present the
+preparation step compiles the required third-party components from source. This
+can take quite some time on the first run. Subsequent runs reuse the created
+image which speeds up the build.
 
 #### Troubleshooting: Internet connectivity when installing local LXD images behind a firewall
 When working behind a firewall you may need to configure proxy or DNS settings for LXD before building the image.
