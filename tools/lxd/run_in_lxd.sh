@@ -43,6 +43,18 @@ if ! lxc image info "$FULL_IMAGE_NAME:$IMAGE_VERSION" >/dev/null 2>&1; then
     echo "Checking Docker Hub via LXD's docker remote..."
     if ! lxc image copy "docker:$FULL_IMAGE_NAME:$IMAGE_VERSION" local: --alias "$FULL_IMAGE_NAME:$IMAGE_VERSION" >/dev/null 2>&1; then
         echo "Image not available on Docker Hub. Building locally..."
+        if ! command -v docker >/dev/null 2>&1; then
+            echo "Docker is required to build the container image locally but was not found." >&2
+            echo "Install Docker or pre-load the image then retry." >&2
+            exit 1
+        fi
+        # Ensure the docker remote exists for importing the built image
+        if ! lxc remote list | grep -q '^docker\s'; then
+            lxc remote add docker docker:// >/dev/null 2>&1 || {
+                echo "Failed to add LXD docker remote." >&2
+                exit 1
+            }
+        fi
         "$REPOROOT/tools/build/builddocker.sh" "$TARGET_OS"
         lxc image copy "docker:$FULL_IMAGE_NAME:latest" local: --alias "$FULL_IMAGE_NAME:$IMAGE_VERSION"
     fi
