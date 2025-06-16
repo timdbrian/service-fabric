@@ -29,21 +29,7 @@ done
 # change directory to the one containing this script and
 # record this directories full path.
 CDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DOCKERIMAGE_VERSION=`cat "$CDIR"/tools/build/DOCKERIMAGE_VERSION`
-OUT_DIR=$CDIR/out
-echo "Running container version $DOCKERIMAGE_VERSION"
-# net=host for connection on corpnet
-# cap-add SYS_PTRACE for strace to work.
-# Note that this has a relative path.  It assumes that
-# the script is two folders from the root directory.
-# the CDIR above will always make this script execute
-# from the directory the script lives in.
-docker run \
-    --net=host \
-    --cap-add NET_ADMIN \
-    -ti \
-    -v "$OUT_DIR":/out \
-    -v "$CDIR"/deps:/deps \
-    -v "$CDIR"/src:/src \
-    microsoft/service-fabric-build-ubuntu:$DOCKERIMAGE_VERSION \
-    bash -i
+IMAGE_VERSION=$(cat "$CDIR"/tools/build/UBUNTUIMAGE_VERSION)
+echo "Running container version $IMAGE_VERSION"
+
+$CDIR/tools/lxd/run_in_lxd.sh ubuntu "bash -i"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Avoid interactive setup in package installations such as tzdata asking for
 # a geographic region
@@ -18,7 +19,7 @@ apt-get install -y libc++1 #FabricTestHost.exe requires.
 apt-get purge -y libc++-dev libc++abi-dev
 apt-get install -y clang-6.0 llvm-6.0-dev # DON'T INSTALL: libc++-dev libc++abi-dev, due to #include_next in string.h
 
-apt-get install -y golang go-md2man
+apt-get install -y golang-go go-md2man
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
 
 #build 3rd parties
@@ -29,11 +30,6 @@ apt-get install -y libncurses5-dev libncursesw5-dev swig libedit-dev  #llvm
 #build cpprest
 ln -s /usr/include/locale.h /usr/include/xlocale.h
 
-#docker ce
-wget -q -O - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sh -c 'echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" > /etc/apt/sources.list.d/docker.list'
-apt-get update
-apt-get install -y docker-ce
 
 #dotnet
 wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
@@ -46,4 +42,11 @@ apt-get install -y dotnet-sdk-2.1
 
 #dotnet 2.1 RunCsc permission fix
 dotnetVersion=$(dotnet --version)
-chmod 777 /usr/share/dotnet/sdk/${dotnetVersion}/Roslyn/bincore/RunCsc
+run_csc_dir="/usr/share/dotnet/sdk/${dotnetVersion}/Roslyn/bincore"
+if [ -f "$run_csc_dir/RunCsc" ]; then
+    chmod 777 "$run_csc_dir/RunCsc"
+elif [ -f "$run_csc_dir/RunCsc.sh" ]; then
+    chmod 777 "$run_csc_dir/RunCsc.sh"
+else
+    echo "RunCsc not found under $run_csc_dir, skipping permission fix"
+fi

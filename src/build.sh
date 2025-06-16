@@ -57,7 +57,7 @@ ScriptPath=`pwd -P`
 popd > /dev/null
 ProjRoot=${ScriptPath}/.. 
 ProjBinRoot=${ProjRoot}
-LibPath=${ProjRoot}/external/WinFab.Linux.Libs
+LibPath=${ProjRoot}/deps/third-party/bin
 CleanBuildDrop="-nc"
 DisablePrecompile="-pd"
 SkipBuild="false"
@@ -70,7 +70,7 @@ CloudBuild="false"
 BuildType="RelWithDebInfo"
 ClangVersion="5.0"
 NumProc=0
-BuildThirdPartyLib="OFF"
+BuildThirdPartyLib="ON"
 VERBOSE=0
 DoKtlOnlyBuild="OFF"
 CLEAN_DEPS=0
@@ -105,26 +105,8 @@ export CMAKE_NO_VERBOSE=1
 # After the docker image has this, this should be removed.
 InstallPkgs()
 {
-    ${ProjRoot}/src/prod/tools/linux/init.sh ${LinuxLibVersion} ${CoreCLRLibVersion} ${SFXLibVersion} ${SFUpgradeTestVersion} ${SFResgenVersion} ${CoreclrBuildArtifacts} ${DataExtensions} ${MCGLinux} ${SFAspNetCoreInternal} ${SFActorsServicesInternal} ${SFLinuxLibssh2} ${SFArmCrossCompileSysRoot} ${CloudBuild} 
-    if [ $? != 0 ]; then
-        return 1
-    fi
-
-    if [ ! -L ${LibPath}/grpc/include/grpc++ ]; then
-        ln ${LibPath}/grpc/include/grpcxx ${LibPath}/grpc/include/grpc++ -rs
-        ln ${LibPath}/grpc/include/grpcxx/grpcxx.h ${LibPath}/grpc/include/grpcxx/grpc++.h -rs
-    fi
-
-    if [ -e ${LibPath}/Boost_1_61_0/lib/libc%2B%2B.so.1 ]
-    then
-       mv ${LibPath}/Boost_1_61_0/lib/libc%2B%2B.so.1 ${LibPath}/Boost_1_61_0/lib/libc++.so.1
-       rm ${LibPath}/Boost_1_61_0/lib/libc%2*.so.1
-    fi
-    if [ -e ${LibPath}/Boost_1_61_0/lib/libc%25252B%25252B.so.1 ]
-    then
-       mv ${LibPath}/Boost_1_61_0/lib/libc%25252B%25252B.so.1 ${LibPath}/Boost_1_61_0/lib/libc++.so.1
-       rm ${LibPath}/Boost_1_61_0/lib/libc%2*.so.1
-    fi
+    InstallDeps
+    return $?
 }
 
 InstallDeps()
